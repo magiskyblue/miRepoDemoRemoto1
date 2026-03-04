@@ -1,0 +1,36 @@
+.miclase{
+    color: white;
+    background-color: purple;
+}
+
+.celda{
+    margin: 2px;
+    background-color: aquamarine;
+}
+
+i{
+    font-size: 50px;
+    color: rgb(96, 205, 63);
+}
+
+.container{
+    height: 800px;
+    color: green;
+    background-color: black;
+}
+
+.navbar{
+    padding: 2px;
+    background-color: lightblue;
+}
+
+.navbar-collapse{
+    align-items: center;
+    justify-content: space-between;
+}
+
+@media screen and (max-width: 700px) {
+    .navbar-brand {
+        display: none;
+    }
+}
