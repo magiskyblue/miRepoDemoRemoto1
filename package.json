@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.100.0",
+    "mongoose": "^9.3.1"
+  }
+}

@@ -1,0 +1,12 @@
+
+.container{
+    background-color: purple;
+    height: 800px;
+}
+
+@media screen and (min-width:700px) {
+    .navbar-brand {
+        display: none;
+    }
+}
+
