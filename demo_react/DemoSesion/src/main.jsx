@@ -6,6 +6,6 @@ import AppCookie from './cookiesSesion/AppCookie';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AppCookie />
+    <AppCookieHttoOnly/>
   </StrictMode>
 );
