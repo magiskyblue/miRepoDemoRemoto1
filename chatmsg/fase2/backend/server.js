@@ -12,6 +12,9 @@ const { createAdapter } = require("@socket.io/redis-adapter");
 const app = express();
 const PORT = 4000;
 
+// ID del servidor
+const SERVER_ID = process.env.SERVER_ID || "server";
+
 const server = http.createServer(app);
 
 // SOCKET.IO
@@ -33,7 +36,7 @@ app.use(cors({
     credentials: true
 }));
 
-// Cookie httpOnly
+// Cookies httpOnly
 app.use((req, res, next) => {
 
     if (!req.cookies.userId) {
@@ -62,32 +65,52 @@ app.get("/messages", (req, res) => {
 // SOCKETS
 io.on("connection", (socket) => {
 
-    console.log("Usuario conectado");
+    console.log(`[${SERVER_ID}] Usuario conectado`);
 
-    // Escuchar mensaje
-    socket.on("sendMessage", (data) => {
+    // Enviar historial al conectar
+    socket.emit("chat_history", messages);
+
+    // Escuchar mensajes enviados desde frontend
+    socket.on("send_message", (data) => {
 
         const message = {
             id: uuidv4(),
-            text: data.text
+            user: data.user,
+            text: data.text,
+            time: new Date().toLocaleTimeString(),
+            server: SERVER_ID
         };
 
+        // Guardar mensaje
         messages.push(message);
 
-        // Enviar a TODOS
-        io.emit("newMessage", message);
+        console.log(`[${SERVER_ID}] Mensaje recibido: ${message.text}`);
+
+        // Enviar mensaje a todos
+        io.emit("receive_message", message);
+
     });
 
     socket.on("disconnect", () => {
-        console.log("Usuario desconectado");
+        console.log(`[${SERVER_ID}] Usuario desconectado`);
     });
+
 });
 
-// REDIS
+// REDIS CLOUD
 async function startRedis() {
 
     const pubClient = createClient({
-        url: "redis://localhost:6379"
+
+        username: process.env.REDIS_USERNAME,
+
+        password: process.env.REDIS_PASSWORD,
+
+        socket: {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT
+        }
+
     });
 
     const subClient = pubClient.duplicate();
@@ -97,11 +120,11 @@ async function startRedis() {
 
     io.adapter(createAdapter(pubClient, subClient));
 
-    console.log("Redis conectado");
+    console.log(`[${SERVER_ID}] Redis Cloud conectado`);
 }
 
 startRedis();
 
 server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+    console.log(`[${SERVER_ID}] Servidor corriendo en puerto ${PORT}`);
 });

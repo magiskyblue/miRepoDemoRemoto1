@@ -1,77 +1,67 @@
-import './App.css';
-
-import { useEffect, useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-// CAMBIA ESTA IP POR TU IP LOCAL
-const socket = io("http://192.168.8.45:4000", {
-  withCredentials: true
+// Conectamos al servidor que corre en el puerto 4000
+const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:4000', {
+  transports: ['websocket', 'polling'],
 });
 
 function App() {
-
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [user, setUser] = useState('');
+  const [message, setMessage] = useState('');
+  const [chat, setChat] = useState([]);
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+    const handleHistory = (history) => setChat(history);
+    const handleReceiveMessage = (msg) => setChat((prev) => [...prev, msg]);
 
-    socket.on("newMessage", (data) => {
-
-      setMessages((prev) => [...prev, data]);
-
-    });
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('chat_history', handleHistory);
+    socket.on('receive_message', handleReceiveMessage);
 
     return () => {
-      socket.off("newMessage");
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('chat_history', handleHistory);
+      socket.off('receive_message', handleReceiveMessage);
     };
-
   }, []);
 
-  const sendMessage = () => {
+  const sendMessage = (e) => {
+    e.preventDefault();
+    const cleanUser = user.trim();
+    const cleanMessage = message.trim();
 
-    if (message.trim() === "") return;
-
-    socket.emit("sendMessage", {
-      text: message
-    });
-
-    setMessage("");
+    if (cleanUser && cleanMessage) {
+      socket.emit('send_message', { user: cleanUser, text: cleanMessage });
+      setMessage('');
+    }
   };
 
   return (
-
-    <div className="App">
-
-      <h1>ChatMSG Fase 2</h1>
-
-      <div className="chat-box">
-
-        {messages.map((msg) => (
-
-          <div className="message" key={msg.id}>
-            {msg.text}
-          </div>
-
+    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
+      <h2>ChatMSG - Fase 1</h2>
+      <p style={{ color: isConnected ? 'green' : 'red' }}>
+        {isConnected ? 'Conectado al servidor' : 'Sin conexion al servidor'}
+      </p>
+      <input 
+        placeholder="Tu nombre..." 
+        value={user}
+        onChange={(e) => setUser(e.target.value)} 
+      />
+      <div style={{ border: '1px solid #ccc', height: '300px', overflowY: 'scroll', margin: '10px 0', padding: '10px', background: '#fff' }}>
+        {chat.map((m) => (
+          <p key={m.id}><strong>{m.user}:</strong> {m.text} <small>{m.time}</small></p>
         ))}
-
       </div>
-
-      <div className="input-area">
-
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Escribe un mensaje"
-        />
-
-        <button onClick={sendMessage}>
-          Enviar
-        </button>
-
-      </div>
-
+      <form onSubmit={sendMessage}>
+        <input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Mensaje..." />
+        <button type="submit">Enviar</button>
+      </form>
     </div>
   );
 }
