@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Grid System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="workspace-grid">
+    <aside id="nav-sidebar">
+      <div class="sidebar-brand">PROFE_LIST v2</div>
+      <div class="sidebar-section-title">Directorios</div>
+      <ul id="dom-groups-list"></ul>
+      <button id="action-create-group">+ Nuevo Módulo</button>
+    </aside>
+
+    <main id="main-dashboard-canvas">
+      <div id="fallback-view" class="center-placeholder">
+        <p>Seleccione un grupo del panel izquierdo para cargar las métricas unificadas.</p>
+      </div>
+
+      <div id="active-dashboard-view" style="display: none;">
+        <header class="dashboard-header">
+          <h1 id="txt-active-group-title">---</h1>
+          <div class="header-management-btns">
+            <button id="action-rename-group">Renombrar</button>
+            <button id="action-purge-group" class="danger-btn">Eliminar</button>
+          </div>
+        </header>
+
+        <div id="stats-summary-grid"></div>
+
+        <div class="split-viewport">
+          
+          <div class="canvas-panel">
+            <div class="panel-heading-bar">
+              <h2>Asistencia del Día</h2>
+              <div class="panel-actions-filters">
+                <input type="date" id="input-date-picker" />
+                <button id="action-add-student">+ Alumno</button>
+              </div>
+            </div>
+            <table class="swiss-table">
+              <thead>
+                <tr><th>Ref</th><th>Nombre del Estudiante</th><th>Asistencia</th><th style="text-align:right;">Opciones</th></tr>
+              </thead>
+              <tbody id="render-asistencia-target"></tbody>
+            </table>
+          </div>
+
+          <div class="canvas-panel">
+            <div class="panel-heading-bar">
+              <h2>Métricas e Historial de Rendimiento</h2>
+            </div>
+            <table class="swiss-table">
+              <thead>
+                <tr><th>Estudiante</th><th class="center">Clases</th><th class="center">Ok</th><th class="center">Err</th><th>Porcentaje Global</th></tr>
+              </thead>
+              <tbody id="render-metrics-target"></tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="global-modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3 id="txt-modal-title">Operación</h3>
+      <div id="modal-container-body"></div>
+      <div class="modal-footer-actions">
+        <button id="modal-btn-confirm">Proceder</button>
+        <button id="modal-btn-dismiss">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

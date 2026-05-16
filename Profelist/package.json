@@ -1,0 +1,14 @@
+{
+  "name": "profe-list",
+  "version": "1.0.0",
+  "description": "Aplicación de escritorio para pasar lista a alumnos",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "db:init": "node database/init.js"
+  },
+  "dependencies": {
+    "electron": "^33.0.0",
+    "mysql2": "^3.11.0"
+  }
+}
